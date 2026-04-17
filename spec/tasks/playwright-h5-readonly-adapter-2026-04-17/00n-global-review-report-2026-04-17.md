@@ -1,0 +1,58 @@
+# XY05 任务报告：00n 全局翻盘审查与结题
+
+## 1. 基本信息
+- 任务ID：`00n`
+- 任务名称：全局翻盘审查与结题
+- 报告日期：2026-04-17
+- 执行人：Hermes
+- 对应看板项：`spec/tasks/playwright-h5-readonly-adapter-2026-04-17/xy05-taskboard-2026-04-17.md`
+
+## 2. 目标与范围
+- 目标：确认 XY05 的 adapter 实现、测试、门禁、文档与证据全部完成。
+- 范围（文件/模块）：整个 XY05 批次。
+- 非目标：真实网络/浏览器接入。
+
+## 3. 变更摘要（前端-后端-数据库全链路）
+- 前端：无变化。
+- 后端 API：通过 resolver 保持外部 route 契约稳定。
+- 服务层：`playwright_h5` 从占位升级为 offline/mock read-only adapter。
+- 数据层/仓储：无变化。
+- 数据库迁移：不涉及。
+
+## 4. 契约与兼容性自检
+- HTTP 路径/方法：`无变化`
+- 请求字段：`无变化`
+- 响应字段：`无变化`
+- SSE / WebSocket / 任务流：`无变化`
+- 兼容策略：`demo` 继续是默认 provider；`playwright_h5` 仅显式选择时生效。
+
+## 5. 验收与门禁结果
+- 专项测试：`25 passed in 1.20s`
+- 构建 / lint / typecheck：`python3 -m compileall apps packages` 通过
+- 契约 / OpenAPI / schema 检查：文档与实现一致
+- 回归测试：现有 read-only endpoints + 新 adapter tests 全部通过
+- 发布门禁 / 审计脚本：`docker compose -f infra/compose/docker-compose.yml config` 通过
+- 新增/修改测试：`apps/hermes-mcp-server/tests/test_playwright_h5_adapter.py`
+
+## 6. KPI（Before -> After）
+| 指标 | Before | After | 变化 | 结论 |
+|---|---:|---:|---:|---|
+| `playwright_h5` adapter | 占位实现 | offline/mock 可用 | 提升 | 完成 |
+| 测试总数 | 21 | 25 | +4 | 完成 |
+| 可选 provider 实用度 | 2/3（仅 demo 可用） | 3/3 中 2 个可用 | 提升 | 完成 |
+
+## 7. 风险与处置
+- 风险：用户误以为 `playwright_h5` 已是“真实采集”。
+- 控制：README 与 mcp-tools 明确写清 offline/mock only。
+- 残余风险：低。
+
+## 8. 证据索引
+- 代码：`apps/hermes-mcp-server/app/adapters/read_providers/playwright_h5.py`
+- 测试：`apps/hermes-mcp-server/tests/test_playwright_h5_adapter.py`
+- 门禁报告：`spec/tasks/playwright-h5-readonly-adapter-2026-04-17/004-validation-gates-output-2026-04-17.txt`
+- 契约产物：`README.md`；`docs/architecture/mcp-tools.md`
+- 其他：`spec/tasks/playwright-h5-readonly-adapter-2026-04-17/`
+
+## 9. 结论与下一步
+- 本任务判定：`Done`
+- 下一步建议：进入 XY06，逐步把 `playwright_h5` 从 offline/mock 升级为真实页面采集实现。

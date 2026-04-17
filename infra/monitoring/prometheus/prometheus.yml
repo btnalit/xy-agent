@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: hermes-mcp-server
+    static_configs:
+      - targets: ["hermes-mcp-server:8080"]

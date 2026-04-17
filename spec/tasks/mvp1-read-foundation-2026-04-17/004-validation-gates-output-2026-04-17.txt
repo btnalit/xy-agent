@@ -1,0 +1,136 @@
+## [2026-04-17] python3 -m compileall apps packages
+Listing 'apps'...
+Listing 'apps/admin-console'...
+Listing 'apps/automation-worker'...
+Listing 'apps/automation-worker/app'...
+Listing 'apps/automation-worker/app/browser'...
+Listing 'apps/automation-worker/app/workers'...
+Listing 'apps/automation-worker/tests'...
+Listing 'apps/hermes-mcp-server'...
+Listing 'apps/hermes-mcp-server/app'...
+Listing 'apps/hermes-mcp-server/app/api'...
+Listing 'apps/hermes-mcp-server/app/services'...
+Listing 'apps/hermes-mcp-server/tests'...
+Listing 'packages'...
+Listing 'packages/xianyu-audit'...
+Listing 'packages/xianyu-audit/xianyu_audit'...
+Listing 'packages/xianyu-core'...
+Listing 'packages/xianyu-core/xianyu_core'...
+Listing 'packages/xianyu-playwright'...
+Listing 'packages/xianyu-playwright/xianyu_playwright'...
+Listing 'packages/xianyu-schemas'...
+Listing 'packages/xianyu-schemas/xianyu_schemas'...
+
+## [2026-04-17] docker compose -f infra/compose/docker-compose.yml config
+name: compose
+services:
+  automation-worker:
+    command:
+      - sh
+      - -lc
+      - PYTHONPATH=apps/automation-worker python -m app.main
+    depends_on:
+      redis:
+        condition: service_started
+        required: true
+    image: python:3.12-slim
+    networks:
+      default: null
+    volumes:
+      - type: bind
+        source: /vol1/1000/codexcli/xianyu-agent-platform
+        target: /workspace
+        bind:
+          create_host_path: true
+    working_dir: /workspace
+  hermes-mcp-server:
+    command:
+      - sh
+      - -lc
+      - pip install fastapi uvicorn pydantic && PYTHONPATH=apps/hermes-mcp-server python -m app.main
+    depends_on:
+      postgres:
+        condition: service_started
+        required: true
+      redis:
+        condition: service_started
+        required: true
+    image: python:3.12-slim
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "8080"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /vol1/1000/codexcli/xianyu-agent-platform
+        target: /workspace
+        bind:
+          create_host_path: true
+    working_dir: /workspace
+  minio:
+    command:
+      - server
+      - /data
+      - --console-address
+      - :9001
+    environment:
+      MINIO_ROOT_PASSWORD: change-me
+      MINIO_ROOT_USER: minio
+    image: minio/minio:latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 9000
+        published: "9000"
+        protocol: tcp
+      - mode: ingress
+        target: 9001
+        published: "9001"
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: minio_data
+        target: /data
+        volume: {}
+  postgres:
+    environment:
+      POSTGRES_DB: xianyu
+      POSTGRES_PASSWORD: change-me
+      POSTGRES_USER: xianyu
+    image: postgres:16
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5432
+        published: "5432"
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: postgres_data
+        target: /var/lib/postgresql/data
+        volume: {}
+  redis:
+    image: redis:7
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 6379
+        published: "6379"
+        protocol: tcp
+networks:
+  default:
+    name: compose_default
+volumes:
+  minio_data:
+    name: compose_minio_data
+  postgres_data:
+    name: compose_postgres_data
+
+## [2026-04-17] PYTHONPATH=apps/hermes-mcp-server python3 -m pytest apps/hermes-mcp-server/tests
+/usr/bin/python3: No module named pytest

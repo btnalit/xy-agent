@@ -8,10 +8,10 @@ from fastapi import FastAPI, HTTPException, Query
 
 try:
     from app.services.dashboard import build_demo_dashboard
-    from app.services.read_foundation import DemoReadFoundationProvider
+    from app.services.read_provider_resolver import get_read_provider
 except ModuleNotFoundError:  # pragma: no cover - direct script fallback
     from services.dashboard import build_demo_dashboard
-    from services.read_foundation import DemoReadFoundationProvider
+    from services.read_provider_resolver import get_read_provider
 
 try:
     from xianyu_schemas.read_models import (
@@ -53,7 +53,7 @@ except ModuleNotFoundError:  # pragma: no cover - direct script fallback
     )
 
 app = FastAPI(title="xianyu-mcp-server", version="0.2.0")
-provider = DemoReadFoundationProvider()
+provider = get_read_provider()
 
 
 @app.get("/healthz")

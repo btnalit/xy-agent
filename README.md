@@ -9,9 +9,11 @@ Hermes 驱动的闲鱼运营副驾驶项目骨架。
 
 ## 当前阶段
 
-本仓库已完成 MVP-1 第一批可交付（只读基础能力）：
+本仓库已完成 MVP-1 第一批可交付（只读基础能力），并在 XY04 完成 real-data adapter foundation：
 - 共享 schema/model：dashboard、orders、items、unread chats、reply suggestion、daily report
-- Hermes MCP Server 只读工具端点（demo provider）
+- Hermes MCP Server 只读工具端点（默认 demo provider）
+- read-only provider 抽象 + adapter 目录骨架（demo / playwright_h5 placeholder / real_upstream placeholder）
+- provider resolver/factory（通过 `XIANYU_READ_PROVIDER` 选择，默认 `demo`）
 - schema/service/endpoint 测试与基础门禁
 - 契约文档更新（`docs/architecture/mcp-tools.md`）
 
@@ -60,6 +62,15 @@ spec/
 
 > 所有接口均为 demo 数据，且统一返回 `request_id` 与 `evidence_refs`。
 
+## Adapter 解析方式（XY04）
+
+- 默认 provider：`demo`
+- 环境变量：`XIANYU_READ_PROVIDER`
+- 目前可解析 key：
+  - `demo`：可用，当前默认
+  - `playwright_h5`：占位实现（未接真实闲鱼）
+  - `real_upstream`：占位实现（未接真实闲鱼）
+
 ## 快速开始
 
 ```bash
@@ -84,7 +95,7 @@ PYTHONPATH=apps/hermes-mcp-server python -m pytest apps/hermes-mcp-server/tests
 
 本项目继承 `/vol1/1000/codexcli/AGENTS.md` 的长任务模式要求。
 当前批次资产位于：
-- `spec/tasks/mvp1-read-foundation-2026-04-17/`
+- `spec/tasks/real-data-adapter-foundation-2026-04-17/`
 
 ## 安全边界提醒
 
